@@ -65,11 +65,27 @@ def display_prediction(uploaded_file, model, model_name, col):
                 st.markdown(f"<h3 style='color: red;'>{model_name} predicts Parkinson's Disease with {confidence * 100:.2f}% confidence.</h3>", unsafe_allow_html=True)
             else:
                 st.markdown(f"<h3 style='color: green;'>{model_name} predicts Healthy with {(1 - confidence) * 100:.2f}% confidence.</h3>", unsafe_allow_html=True)
+        return confidence
+
+
+# Initialize confidence variables
+spiral_confidence = None
+mri_confidence = None
+wave_confidence = None
 
 # Display predictions for each model side by side
 if uploaded_spiral:
-    display_prediction(uploaded_spiral, spiral_model, "Spiral Model", col1)
+    spiral_confidence = display_prediction(uploaded_spiral, spiral_model, "Spiral Model", col1)
 if uploaded_mri:
-    display_prediction(uploaded_mri, mri_model, "MRI Model", col2)
+    mri_confidence = display_prediction(uploaded_mri, mri_model, "MRI Model", col2)
 if uploaded_wave:
-    display_prediction(uploaded_wave, wave_model, "Wave Model", col3)
+    wave_confidence = display_prediction(uploaded_wave, wave_model, "Wave Model", col3)
+
+# Check if all models have a confidence value before proceeding
+if all(conf is not None for conf in [spiral_confidence, mri_confidence, wave_confidence]):
+    if(spiral_confidence <= 0.5 and mri_confidence <= 0.5 and wave_confidence <= 0.5):
+        st.markdown(f"<h3 style='color: green;'>Model predicts the person is Healthy with {(1 - (spiral_confidence + wave_confidence + mri_confidence) / 3) * 100:.2f}% confidence.</h3>", unsafe_allow_html=True)
+    elif(spiral_confidence > 0.5 and mri_confidence > 0.5 and wave_confidence > 0.5):
+        st.markdown(f"<h3 style='color: red;'>Model predicts Parkinson's Disease with {(spiral_confidence + wave_confidence + mri_confidence) / 3 * 100:.2f}% confidence. It is highly recommended that the person should consult a doctor.</h3>", unsafe_allow_html=True)
+    else:
+        st.markdown(f"<h3 style='color: yellow;'>It is likely that the person may have Parkinson's, so it is advisable to visit a hospital for a proper checkup.</h3>", unsafe_allow_html=True)
