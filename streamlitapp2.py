@@ -1,5 +1,4 @@
 import streamlit as st
-from streamlit.elements import heading
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 import numpy as np
@@ -16,8 +15,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 from datetime import datetime
-import requests
-from io import BytesIO
 
 # Set the page layout to wide to utilize full screen width
 st.set_page_config(layout="wide")
@@ -134,14 +131,33 @@ if all(conf is not None for conf in [spiral_confidence, mri_confidence, wave_con
         final_confidence = 0.00
 
     if final_confidence is not None:
-        if final_prediction == 'Parkinson\'s Disease' or final_prediction == 'Likely Parkinson\'s Disease':
-            st.markdown(f"<h3 style='color: {'red' if final_prediction == 'Parkinson\'s Disease' else 'green' if final_prediction == 'Healthy' else 'yellow'};'>Model predicts {final_prediction} ,need to consult doctor.</h3>", unsafe_allow_html=True)
-        else:
-            st.markdown(f"<h3 style='color: {'red' if final_prediction == 'Parkinson\'s Disease' else 'green' if final_prediction == 'Healthy' else 'yellow'};'>Model predicts {final_prediction}.</h3>", unsafe_allow_html=True)
-
-
+        st.markdown(f"<h3 style='color: {'red' if final_prediction == 'Parkinson\'s Disease' else 'green' if final_prediction == 'Healthy' else 'yellow'};'>Model predicts {final_prediction} ,need to consult doctor.</h3>", unsafe_allow_html=True)
 
 col5, col6 = st.columns(2)
+
+with col5:
+    import matplotlib.pyplot as plt
+
+    if all(conf is not None for conf in [spiral_confidence, mri_confidence, wave_confidence]):
+        model_names = ['Spiral', 'MRI', 'Wave']
+        confidences = [spiral_confidence, mri_confidence, wave_confidence]
+        
+        # Set up a smaller figure size
+        fig, ax = plt.subplots(figsize=(2, 2))  # Adjust the figure size to make it even smaller
+
+        # Create the bar chart
+        ax.bar(model_names, confidences, color=['red', 'green', 'blue'])
+
+        # Reduce font sizes for labels and title
+        ax.set_ylabel('Confidence Level', fontsize=8)
+        ax.set_title('Model Confidence Levels', fontsize=10)
+        ax.tick_params(axis='both', which='major', labelsize=8)  # Small tick labels
+
+        # Adjust the layout to make the chart compact
+        plt.tight_layout()
+
+        # Display the bar chart using Streamlit
+        st.pyplot(fig)
 
 # Function to create a PDF report
 def create_report(filename, user_name, final_prediction, final_confidence):
@@ -281,55 +297,55 @@ if 'faq_visible' not in st.session_state:
 faqs = [
     {
         "question": "What is Parkinson's disease?",
-        "answer": "➡️ Parkinson's disease is a progressive neurological disorder that affects movement."
+        "answer": "Parkinson's disease is a progressive neurological disorder that affects movement."
     },
     {
         "question": "What are the symptoms?",
-        "answer": "➡️ Common symptoms include tremors, stiffness, and difficulty with balance and coordination."
+        "answer": "Common symptoms include tremors, stiffness, and difficulty with balance and coordination."
     },
     {
         "question": "How is it diagnosed?",
-        "answer": "➡️ Diagnosis is usually based on medical history and neurological examination."
+        "answer": "Diagnosis is usually based on medical history and neurological examination."
     },
     {
         "question": "What treatments are available?",
-        "answer": "➡️ Treatments can include medications, physical therapy, and in some cases, surgery."
+        "answer": "Treatments can include medications, physical therapy, and in some cases, surgery."
     },
         {
         "question": "What is Parkinson's disease?",
-        "answer": "➡️ Parkinson's disease is a progressive neurological disorder that affects movement."
+        "answer": "Parkinson's disease is a progressive neurological disorder that affects movement."
     },
     {
         "question": "What are the symptoms?",
-        "answer": "➡️ Common symptoms include tremors, stiffness, and difficulty with balance and coordination."
+        "answer": "Common symptoms include tremors, stiffness, and difficulty with balance and coordination."
     },
     {
         "question": "How is it diagnosed?",
-        "answer": "➡️ Diagnosis is usually based on medical history and neurological examination."
+        "answer": "Diagnosis is usually based on medical history and neurological examination."
     },
     {
         "question": "What treatments are available?",
-        "answer": "➡️ Treatments can include medications, physical therapy, and in some cases, surgery."
+        "answer": "Treatments can include medications, physical therapy, and in some cases, surgery."
     },
     {
         "question": "What causes Parkinson's disease?",
-        "answer": "➡️ Parkinson's disease is believed to result from a combination of genetic and environmental factors. The exact cause is not fully understood, but it involves the degeneration of dopamine-producing neurons in the brain."
+        "answer": "Parkinson's disease is believed to result from a combination of genetic and environmental factors. The exact cause is not fully understood, but it involves the degeneration of dopamine-producing neurons in the brain."
     },
     {
         "question": "Is Parkinson's disease hereditary?",
-        "answer": "➡️ While most cases of Parkinson's disease are not directly inherited, genetic factors can increase the risk. Having a family member with the disease may slightly elevate your risk, but the majority of cases are sporadic."
+        "answer": "While most cases of Parkinson's disease are not directly inherited, genetic factors can increase the risk. Having a family member with the disease may slightly elevate your risk, but the majority of cases are sporadic."
     },
     {
         "question": "Can Parkinson's disease be cured?",
-        "answer": "➡️ Currently, there is no cure for Parkinson's disease. However, various treatments and therapies can help manage symptoms and improve quality of life."
+        "answer": "Currently, there is no cure for Parkinson's disease. However, various treatments and therapies can help manage symptoms and improve quality of life."
     },
     {
         "question": "What lifestyle changes can help manage symptoms?",
-        "answer": "➡️ Regular exercise, a balanced diet, adequate sleep, and stress management techniques can significantly help in managing symptoms. Engaging in social activities and maintaining a strong support network are also beneficial."
+        "answer": "Regular exercise, a balanced diet, adequate sleep, and stress management techniques can significantly help in managing symptoms. Engaging in social activities and maintaining a strong support network are also beneficial."
     },
     {
         "question": "Are there any clinical trials available for Parkinson's disease?",
-        "answer": "➡️ Yes, many clinical trials are ongoing to explore new treatments and therapies for Parkinson's disease. Patients interested in participating should consult with their healthcare provider for information on current trials and eligibility."
+        "answer": "Yes, many clinical trials are ongoing to explore new treatments and therapies for Parkinson's disease. Patients interested in participating should consult with their healthcare provider for information on current trials and eligibility."
     },
 ]
 
@@ -356,44 +372,19 @@ st.markdown("[National Parkinson's Foundation](https://www.parkinson.org)")
 
 
 # Parkinson's Awareness Section
-st.subheader("How could you tell if you have Parkinson's Disease at an early stage? Here are some early symptoms which you can catch on.")
+st.subheader("Parkinson's Disease Awareness")
 
 
 # Create two columns
 col1, col2 = st.columns(2)
 
-# # Display images in the center by using both columns
-# with col1:
-#     st.image("https://www.apdaparkinson.org/wp-content/uploads/2018/09/symptoms2.jpg", 
-#               caption="Parkinson's Signs and Symptoms", 
-#               use_column_width=True,
-#               height = 300)
-
-# with col2:
-#     st.image("https://www.lompocvmc.com/images/blog/parkinsons-02.jpg", 
-#               caption="Parkinson's Signs and Symptoms", 
-#               use_column_width=True,height = 300)
-    
-# Function to resize the images while keeping the aspect ratio
-def resize_image(url, height):
-    response = requests.get(url)
-    img = Image.open(BytesIO(response.content))
-    aspect_ratio = img.width / img.height
-    new_width = int(aspect_ratio * height)
-    resized_img = img.resize((new_width, height))
-    return resized_img
-
-# Set the desired height
-desired_height = 1100
-
-# Resize both images
-img1 = resize_image("https://www.apdaparkinson.org/wp-content/uploads/2018/09/symptoms2.jpg", desired_height)
-img2 = resize_image("https://www.lompocvmc.com/images/blog/parkinsons-02.jpg", desired_height)
-
-col1, col2 = st.columns(2)
-
+# Display images in the center by using both columns
 with col1:
-    st.image(img1, caption="Parkinson's Signs and Symptoms  ")
+    st.image("https://imgs.search.brave.com/j94_4aRGXRAzvhEWY0BXJl2AnXyfm-0JlQYCzDAZLqg/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cGFya2luc29uLm9y/Zy9zaXRlcy9kZWZh/dWx0L2ZpbGVzL3N0/eWxlcy80MDBweF93/aWRlL3B1YmxpYy9p/bWFnZXMvVGFrZTZG/b3JQRC0xLnBuZz9p/dG9rPVV3RV9mS1Y0", 
+              caption="Parkinson's Disease Awareness Month", 
+              use_column_width=True)
 
 with col2:
-    st.image(img2, caption="Parkinson's Signs and Symptoms")
+    st.image("https://imgs.search.brave.com/rOLcvpMq7nGNVvvyQJzECrhMhagCMtBXT8NAPHvF7Xo/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly93d3cu/aG9tZXdhdGNoY2Fy/ZWdpdmVycy5jb20v/c3ViLzQ2NTUzL2lt/YWdlcy9wYXJrc2lu/c29ucy5wbmc", 
+              caption="Parkinson's Signs and Symptoms", 
+              use_column_width=True)
