@@ -131,7 +131,7 @@ if all(conf is not None for conf in [spiral_confidence, mri_confidence, wave_con
         final_confidence = (spiral_confidence + wave_confidence + mri_confidence) / 3 * 100
     else:
         final_prediction = "Likely Parkinson's Disease"
-        final_confidence = 0.00
+        final_confidence = 0
 
     if final_confidence is not None:
         if final_prediction == 'Parkinson\'s Disease' or final_prediction == 'Likely Parkinson\'s Disease':
@@ -175,7 +175,8 @@ def create_report(filename, user_name, final_prediction, final_confidence):
 
         # Prediction Results
         report_elements.append(Paragraph(f"<b>Final Prediction:</b> {final_prediction}", custom_style))
-        report_elements.append(Paragraph(f"<b>Confidence:</b> {final_confidence:.2f}%", custom_style))
+        if(final_confidence!=0):
+            report_elements.append(Paragraph(f"<b>Confidence:</b> {final_confidence:.2f}%", custom_style))
         report_elements.append(Spacer(1, 12))
 
         # Medical Advice with Bullet Points
@@ -259,7 +260,7 @@ if st.session_state.report_filename:
         send_email(st.session_state.report_filename, user_email)
 
 
-st.markdown("[Schedule a Telemedicine Appointment](https://example.com/schedule)")
+st.markdown("[Schedule a Telemedicine Appointment](https://www.practo.com/search/doctors?results_type=doctor&q=%5B%7B%22word%22%3A%22neurologist%22%2C%22autocompleted%22%3Atrue%2C%22category%22%3A%22subspeciality%22%7D%5D&city=Pune)")
 
 
 
@@ -343,10 +344,6 @@ if st.session_state.faq_visible:
     for faq in faqs:
         st.write(f"*{faq['question']}*")
         st.write(f"{faq['answer']}")
-
-
-
-
 
 
 st.write("*Helpful Resources:*")

@@ -1,4 +1,8 @@
 streamlit
-tensorflow==2.12.0  # or any other version you are using
-Pillow
+tensorflow
 numpy
+Pillow
+reportlab
+smtplib
+email
+requests
